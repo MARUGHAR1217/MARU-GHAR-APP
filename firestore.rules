@@ -1,0 +1,42 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.uid == "yJYiuaUE3KXVLVuWqLyLRH5owQJ3";
+    }
+    function validCommon(data) {
+      return data.keys().hasAll(['ownerName','ownerPhone','type','purpose','location','price','description','ownerConsent','photos','status','createdAt','submitterUid'])
+        && data.keys().hasOnly(['ownerName','ownerPhone','type','purpose','location','price','description','ownerConsent','photos','status','createdAt','submitterUid','reviewedAt','reviewedBy','videos'])
+        && data.ownerName is string && data.ownerName.size() >= 2 && data.ownerName.size() <= 80
+        && data.ownerPhone is string && data.ownerPhone.matches('^[0-9+() -]{10,16}$')
+        && data.type in ['ઘર','ફ્લેટ','દુકાન','રેસિડેન્શિયલ પ્લોટ','કોમર્શિયલ પ્લોટ','ઓફિસ','વેરહાઉસ']
+        && data.purpose in ['ભાડે','વેચાણ']
+        && data.location is string && data.location.size() >= 2 && data.location.size() <= 120
+        && data.price is string && data.price.size() <= 60
+        && data.description is string && data.description.size() <= 1200
+        && data.ownerConsent == true && data.photos is list
+        && (!('videos' in data) || data.videos is list);
+    }
+    match /listings/{listingId} {
+      allow read: if isAdmin() || resource.data.status == 'approved';
+      // Property owners can only create pending listings, never approve or publish them.
+      allow create: if request.auth != null && !isAdmin() && validCommon(request.resource.data)
+        && request.resource.data.status == 'pending'
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.submitterUid == request.auth.uid
+        && !('reviewedAt' in request.resource.data)
+        && !('reviewedBy' in request.resource.data);
+      // Only the fixed admin can add a listing directly or add one pending for review.
+      allow create: if isAdmin() && validCommon(request.resource.data)
+        && request.resource.data.status in ['pending','approved']
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.submitterUid == request.auth.uid;
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status','reviewedAt','reviewedBy'])
+        && request.resource.data.status in ['pending','approved','rejected']
+        && request.resource.data.reviewedBy == request.auth.uid;
+      allow delete: if isAdmin();
+    }
+  }
+}

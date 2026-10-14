@@ -1,0 +1,17 @@
+{
+  "name": "Maru Ghar - Gandhinagar Property",
+  "short_name": "Maru Ghar",
+  "lang": "gu",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#F5F7FA",
+  "theme_color": "#006837",
+  "icons": [
+    {"src":"assets/maru-ghar-logo-3d-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
+    {
+      "src": "assets/icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    }
+  ]
+}

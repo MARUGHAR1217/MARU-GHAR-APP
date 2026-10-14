@@ -1,0 +1,17 @@
+{
+  "name": "maru-ghar-gandhinagar",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Maru Ghar premium property listing website and Android wrapper",
+  "scripts": {
+    "copy-web": "node -e \"const fs=require('fs');const path=require('path');function cp(s,d){fs.mkdirSync(path.dirname(d),{recursive:true});fs.copyFileSync(s,d)}fs.rmSync('www',{recursive:true,force:true});fs.mkdirSync('www/assets',{recursive:true});cp('index.html','www/index.html');cp('admin.html','www/admin.html');cp('privacy.html','www/privacy.html');cp('download.html','www/download.html');cp('firebase-config.js','www/firebase-config.js');cp('manifest.webmanifest','www/manifest.webmanifest');for(const f of fs.readdirSync('assets')){if(fs.statSync(path.join('assets',f)).isFile())cp(path.join('assets',f),path.join('www/assets',f))}\""
+  },
+  "dependencies": {
+    "@capacitor/core": "^6.2.1",
+    "@capacitor/android": "^6.2.1"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.2.1",
+    "@capacitor/assets": "^3.0.5"
+  }
+}
